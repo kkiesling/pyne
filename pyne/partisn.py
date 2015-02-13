@@ -765,6 +765,78 @@ def _write_input(title, block01, block02, block03, block04, block05, name=None):
     f.write(partisn)
 
 
+def write_1D_radial_build(info, ngroup, pn):
+    """This will create a 1D PARTISN input file given bound and material 
+    information.
+    
+    Parameters:
+    -----------
+    info : list of dictionaries
+        A list where each item represents all information pertaining to a 
+        coarse mesh. Note that the list items must be organized in ascending order 
+        by the value for 'bound'
+        keys:
+            bound : float, maximum x value for coarse mesh.
+                Note: the lowest bound is assumed to be 0.0.
+            fine : int, number of fine mesh intervals. Note that there must be a 
+                minimum of 2 per coarse mesh and 7 total.
+            mat : array of lists,
+                First list is list of PyNE material objects representative of the 
+                material or mix of materials present in the coarse mesh. Second 
+                list is the correspoding volume fractions for each material (floats).
+                If void is present, supply empty array with no volume fraction.
+                Example with 50% mat1/50% void and 100% void:
+                    50% void: [[mat1], [0.5]]
+                    100% void: [[],[]]
+            source : boolean, True if coarse mesh is the source, False if not.
+                Note: source is assumed to be isotropic and uniformily distributed
+        
+        Example: [{'bound': 0.5, 'fine': 3, 'mat': [[mat1], [1.0]], 'source': True}, 
+                  {'bound': 0.7, 'fine': 2, 'mat': [[mat2, mat3], [0.4, 0.6]], 'source': False}]
+    ngroup : int
+        The number of energy groups in the cross section library.
+    pn : int
+        The number of moments in a P_n expansion of the source.
+    """
+    
+    # Initialize dictionaries for each PARTISN block
+    block01 = {}
+    block02 = {}
+    block03 = {}
+    block04 = {}
+    block05 = {}
+    
+    # Set automatic variables
+    block01['igeom'] = 'slab'
+    block01['ngroup'] = ngroup
+    block01['im'] = len(info)
+    
+    coarse, fine = _create_mesh(info)
+    block01['it'] = sum(fine)
+    
+    # BLOCK01 TO SET: niso, nzone
+    print(info)
+    print(block01)
+    
+
+def _create_mesh(info):
+    """Gather coarse and fine mesh information
+    """
+    coarse = []
+    fine = []
+    for ve in info:
+        coarse += [ve['bound']]
+        fine += [ve['fine']]
+
+    return coarse, fine
+
+
+def _create_mat_lib(info):
+    # gather data to create mat_lib given pyne material objects
+    # I think this can be incorporated into get_material_library above.
+    pass
+    
+
 def format_repeated_vector(vector):
     """Creates string out of a vector with the PARTISN format for repeated
     numbers.
