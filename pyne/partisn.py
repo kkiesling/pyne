@@ -167,7 +167,7 @@ def write_partisn_input(mesh, hdf5, ngroup, pn, **kwargs):
     block01['ngroup'] = ngroup
     block01['mt'] = len(mat_lib)
     
-    block02['zones'], block04['assign'] = _get_zones(mesh, hdf5, bounds, num_rays, grid)
+    block02['zones'], block04['assign'], mesh_zones = _get_zones(mesh, hdf5, bounds, num_rays, grid)
     block01['nzone'] = len(block04['assign'])
     
     for dim in bounds:
@@ -209,6 +209,10 @@ def write_partisn_input(mesh, hdf5, ngroup, pn, **kwargs):
     # call function to write to file
     input_file = input_file if input_file_tf else None
     _write_input(title, block01, block02, block03, block04, block05, name=input_file)
+    
+    return mesh_zones
+    
+    
 
 
 def _get_material_lib(hdf5, data_hdf5path, nuc_hdf5path, **kwargs):
@@ -357,16 +361,17 @@ def _get_zones(mesh, hdf5, bounds, num_rays, grid):
         zones[z]['vol_frac'] = []
         zones[z]['mat'] = []
         for i, cell in enumerate(voxel[z]['cell']):
-            if mat_assigns[cell] not in zones[z]['mat']:
-                # create new entry
-                zones[z]['mat'].append(mat_assigns[cell])
-                zones[z]['vol_frac'].append(voxel[z]['vol_frac'][i])
-            else:
-                # update value that already exists with new volume fraction
-                for j, val in enumerate(zones[z]['mat']):
-                    if mat_assigns[cell] == val:
-                        vol_frac = zones[z]['vol_frac'][j] + voxel[z]['vol_frac'][i]
-                        zones[z]['vol_frac'][j] = vol_frac
+            if cell in mat_assigns: # REMOVE THIS LATER
+                if mat_assigns[cell] not in zones[z]['mat']:
+                    # create new entry
+                    zones[z]['mat'].append(mat_assigns[cell])
+                    zones[z]['vol_frac'].append(voxel[z]['vol_frac'][i])
+                else:
+                    # update value that already exists with new volume fraction
+                    for j, val in enumerate(zones[z]['mat']):
+                        if mat_assigns[cell] == val:
+                            vol_frac = zones[z]['vol_frac'][j] + voxel[z]['vol_frac'][i]
+                            zones[z]['vol_frac'][j] = vol_frac
     
     # Remove vacuum or graveyard from material definition if not vol_frac of 1.0
     skip_array = [['mat:Vacuum'], ['mat:vacuum'], ['mat:Graveyard'], ['mat:graveyard']]
@@ -424,7 +429,7 @@ def _get_zones(mesh, hdf5, bounds, num_rays, grid):
                 voxel_zone[i] = 0
             else:
                 voxel_zone[i] = y
-    
+
     # Remove any instances of graveyard or vacuum in zone definitions
     zones_novoid = {}
     for z in zones_mats:
@@ -458,7 +463,40 @@ def _get_zones(mesh, hdf5, bounds, num_rays, grid):
             zones_formatted[jk, i] = voxel_zone[n]
             n += 1
     
-    return zones_formatted, zones_novoid
+    # Tag mesh with zone number and materials
+    # tagging with zone number
+    zone_num = np.empty(len(voxel_zone), dtype=int)  
+    #for v in voxel_zone:
+    #    zone_num[v] = voxel_zone[v]
+    #    mat_names[v] = np.array(zones_novoid[zone_num[v]]['mat'])
+    #    mat_volfrac[v] = np.array(zones_novoid[zone_num[v]]['vol_frac'])
+    #    print(np.array(zones_novoid[zone_num[v]]['mat']))
+    
+    # tagging with mat name and vol frac
+    # find longest list of mats to create shape of numpy array
+    ll = 0
+    for z in zones_novoid:
+        l = len(zones_novoid[z]['mat'])
+        if l > ll:
+            ll = l
+
+    mat_names = np.empty((len(voxel_zone),ll), dtype=str)
+    mat_volfrac = np.empty((len(voxel_zone),ll), dtype=float)
+    for v in voxel_zone:
+        zone_num[v] = voxel_zone[v]
+        l = len(zones_novoid[zone_num[v]]['mat'])
+        print(zones_novoid[zone_num[v]]['mat'])
+        mat_names[v][0:l] = np.array(zones_novoid[zone_num[v]]['mat'],dtype=str)
+        mat_volfrac[v][0:l] = np.array(zones_novoid[zone_num[v]]['vol_frac'])
+        
+    mesh.tag("zone", value=zone_num, dtype=int)
+    #mesh.tag("mat_name", value=mat_names)
+    #mesh.tag("mat_volfrac", value=mat_volfrac, dtype=float)
+    
+    #print(mesh.mat_name)
+    #print(mesh.mat_volfrac)
+    
+    return zones_formatted, zones_novoid, mesh
     
 
 def _check_fine_mesh_total(block01):
