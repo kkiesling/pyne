@@ -71,13 +71,15 @@ def write_partisn_input(mesh, hdf5, ngroup, pn, **kwargs):
         mesh intervals per coarse mesh interval will be created. The sum of all
         fine mesh intervals in the problem must be greater than or equal to 7.
         Mesh can be 1-D (Nx1x1 mesh), 2-D (NxMx1 mesh), or 3-D (NxMxP mesh).
-        Note: Only Cartesian meshes are currently supported.
+        Note: Only Cartesian meshes are currently supported. 
+        This mesh will be updated with tags for zone number ("partisn_zone") 
+        and majority material number ("partisn_majority_matl").
     hdf5 : string
         File path to a material-laden dagmc geometry file.
     ngroup : int
         The number of energy groups in the cross section library.
     pn : int
-        The number of moments in a P_n expansion of the source.
+        The number N a P_N expansion of the source.
     data_hdf5path : string, optional, default = material_library/materials
         the path in the heirarchy to the data table in an HDF5 file.
     nuc_hdf5path : string, optional, default = material_library/nucid
@@ -98,6 +100,12 @@ def write_partisn_input(mesh, hdf5, ngroup, pn, **kwargs):
         true, a linearly spaced grid of starting points is used, with dimension 
         sqrt(num_rays) x sqrt(num_rays). In this case, "num_rays" must be a 
         perfect square.
+    skip_empty : boolean, default = False
+        All volumes in the geometry must be assigned a material. If skip_empty
+        is False, the program will fail and issue an error that there are 
+        unassigned volume(s). If True, unassigned volumes will be skipped and
+        the program will run to completion.
+        WARNING! If True, resulting partisn input could be incorrect!
     
     Returns
     -------
@@ -143,6 +151,16 @@ def write_partisn_input(mesh, hdf5, ngroup, pn, **kwargs):
         input_file_tf = True
     else:
         input_file_tf = False
+        
+    # skip
+    if 'skip_empty' in kwargs:
+        skip_empty = kwargs['skip_empty']
+    else:
+        skip_empty = False
+    
+    # issue warning if skip_empty is True
+    if skip_empty:
+        warn("skip_empty=True. Some volumes may not be assigned a material.")
     
     # Dictionary of hdf5 names and cross section library names
     # Assumes PyNE naming convention in the cross section library if no dict
@@ -167,7 +185,7 @@ def write_partisn_input(mesh, hdf5, ngroup, pn, **kwargs):
     block01['ngroup'] = ngroup
     block01['mt'] = len(mat_lib)
     
-    block02['zones'], block04['assign'], voxel_zone = _get_zones(mesh, hdf5, bounds, num_rays, grid)
+    block02['zones'], block04['assign'], voxel_zone = _get_zones(mesh, hdf5, bounds, num_rays, grid, skip_empty)
     block01['nzone'] = len(block04['assign'])
     
     for dim in bounds:
@@ -212,8 +230,7 @@ def write_partisn_input(mesh, hdf5, ngroup, pn, **kwargs):
     
     _tag_mesh(mesh, voxel_zone, block04['assign'], mat_xs_names)
 
-        
-    
+
 def _get_material_lib(hdf5, data_hdf5path, nuc_hdf5path, **kwargs):
     """Read material properties from the loaded dagmc geometry.
     """
@@ -326,7 +343,7 @@ def _get_coord_sys(mesh, pn):
     return igeom, bounds, nmq
 
 
-def _get_zones(mesh, hdf5, bounds, num_rays, grid):
+def _get_zones(mesh, hdf5, bounds, num_rays, grid, skip_empty):
     """Get the minimum zone definitions for the geometry.
     """
     
@@ -355,12 +372,15 @@ def _get_zones(mesh, hdf5, bounds, num_rays, grid):
     # Replace cell numbers with materials, eliminating duplicate materials
     # within single zone definition
     zones = {}
+    cell_empty = False
     for z in voxel:
         zones[z] = {}
         zones[z]['vol_frac'] = []
         zones[z]['mat'] = []
         for i, cell in enumerate(voxel[z]['cell']):
-            if cell in mat_assigns: # REMOVE THIS LATER
+            
+            # assign material vol fractions if cell has material
+            if cell in mat_assigns:
                 if mat_assigns[cell] not in zones[z]['mat']:
                     # create new entry
                     zones[z]['mat'].append(mat_assigns[cell])
@@ -371,6 +391,15 @@ def _get_zones(mesh, hdf5, bounds, num_rays, grid):
                         if mat_assigns[cell] == val:
                             vol_frac = zones[z]['vol_frac'][j] + voxel[z]['vol_frac'][i]
                             zones[z]['vol_frac'][j] = vol_frac
+        
+            # warn for every volume missing a material
+            else:
+                warn("Cell {0} does not have a material".format(cell))
+                cell_empty = True
+
+    # if cells were empty and skip_empty is false, issue error and end program
+    if not skip_empty and cell_empty:
+        sys.exit("ERROR: There are cell(s) without materials in this geometry. Program ended.")
     
     # Remove vacuum or graveyard from material definition if not vol_frac of 1.0
     skip_array = [['mat:Vacuum'], ['mat:vacuum'], ['mat:Graveyard'], ['mat:graveyard']]
