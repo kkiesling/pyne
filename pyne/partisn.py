@@ -210,7 +210,7 @@ def write_partisn_input(mesh, hdf5, ngroup, pn, **kwargs):
     input_file = input_file if input_file_tf else None
     _write_input(title, block01, block02, block03, block04, block05, name=input_file)
     
-    _tag_mesh(mesh, voxel_zone, block04['assign'])
+    _tag_mesh(mesh, voxel_zone, block04['assign'], mat_xs_names)
 
         
     
@@ -769,7 +769,7 @@ def _write_input(title, block01, block02, block03, block04, block05, name=None):
     f.write(partisn)
 
 
-def _tag_mesh(mesh, voxel_zone, zones_novoid):
+def _tag_mesh(mesh, voxel_zone, zones_novoid, mat_xs_names):
 
     # Find majorant material name in each zone
     majorant_mat_name = {}  # keys = zone numbers, items = mat name
@@ -796,20 +796,27 @@ def _tag_mesh(mesh, voxel_zone, zones_novoid):
             void = 1.0 - total
             if void > ff:
                 majorant_mat_name[i] = 'void'    # rename as void
-    
-    print(majorant_mat_name)
-    
+       
     # Assign material name an integer, in the order that they appear in the 
     # partisn input
-    
+    majorant_mat_num = {}
+    for i, mat in enumerate(mat_xs_names):
+        majorant_mat_num[mat] = i
 
-    # Tag mesh with zone number
-    zone_num = np.empty(len(voxel_zone), dtype=int)  
+    # Tag mesh with zone number and majority material number
+    zone_num = np.empty(len(voxel_zone), dtype=int)
+    maj_mat = np.empty(len(voxel_zone), dtype=int)
 
     for i, v in enumerate(voxel_zone):
         zone_num[i] = voxel_zone[v]
-        
+        mat = majorant_mat_name[voxel_zone[v]]
+        if mat == "void":
+            maj_mat[i] = 0
+        else:
+            maj_mat[i] = majorant_mat_num[mat]
+ 
     mesh.tag("partisn_zone", value=zone_num, dtype=int)
+    mesh.tag("partisn_majority_matl", value=maj_mat, dtype=int)
     
     
 def format_repeated_vector(vector):
