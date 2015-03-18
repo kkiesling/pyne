@@ -167,7 +167,7 @@ def write_partisn_input(mesh, hdf5, ngroup, pn, **kwargs):
     block01['ngroup'] = ngroup
     block01['mt'] = len(mat_lib)
     
-    block02['zones'], block04['assign'], mesh_zones = _get_zones(mesh, hdf5, bounds, num_rays, grid)
+    block02['zones'], block04['assign'], voxel_zone = _get_zones(mesh, hdf5, bounds, num_rays, grid)
     block01['nzone'] = len(block04['assign'])
     
     for dim in bounds:
@@ -210,11 +210,10 @@ def write_partisn_input(mesh, hdf5, ngroup, pn, **kwargs):
     input_file = input_file if input_file_tf else None
     _write_input(title, block01, block02, block03, block04, block05, name=input_file)
     
-    return mesh_zones
-    
-    
+    _tag_mesh(mesh, voxel_zone, block04['assign'])
 
-
+        
+    
 def _get_material_lib(hdf5, data_hdf5path, nuc_hdf5path, **kwargs):
     """Read material properties from the loaded dagmc geometry.
     """
@@ -247,7 +246,7 @@ def _get_material_lib(hdf5, data_hdf5path, nuc_hdf5path, **kwargs):
             # convert from [at/cc] to [at/b-cm]
             comp_list[nucid] = dens*10.**-24
         mat_lib[mat_name] = comp_list
-
+        
     return mat_lib
 
 
@@ -429,7 +428,7 @@ def _get_zones(mesh, hdf5, bounds, num_rays, grid):
                 voxel_zone[i] = 0
             else:
                 voxel_zone[i] = y
-
+    
     # Remove any instances of graveyard or vacuum in zone definitions
     zones_novoid = {}
     for z in zones_mats:
@@ -463,41 +462,8 @@ def _get_zones(mesh, hdf5, bounds, num_rays, grid):
             zones_formatted[jk, i] = voxel_zone[n]
             n += 1
     
-    # Tag mesh with zone number and materials
-    # tagging with zone number
-    zone_num = np.empty(len(voxel_zone), dtype=int)  
-    #for v in voxel_zone:
-    #    zone_num[v] = voxel_zone[v]
-    #    mat_names[v] = np.array(zones_novoid[zone_num[v]]['mat'])
-    #    mat_volfrac[v] = np.array(zones_novoid[zone_num[v]]['vol_frac'])
-    #    print(np.array(zones_novoid[zone_num[v]]['mat']))
-    
-    # tagging with mat name and vol frac
-    # find longest list of mats to create shape of numpy array
-    ll = 0
-    for z in zones_novoid:
-        l = len(zones_novoid[z]['mat'])
-        if l > ll:
-            ll = l
+    return zones_formatted, zones_novoid, voxel_zone
 
-    mat_names = np.empty((len(voxel_zone),ll), dtype=str)
-    mat_volfrac = np.empty((len(voxel_zone),ll), dtype=float)
-    for v in voxel_zone:
-        zone_num[v] = voxel_zone[v]
-        l = len(zones_novoid[zone_num[v]]['mat'])
-        print(zones_novoid[zone_num[v]]['mat'])
-        mat_names[v][0:l] = np.array(zones_novoid[zone_num[v]]['mat'],dtype=str)
-        mat_volfrac[v][0:l] = np.array(zones_novoid[zone_num[v]]['vol_frac'])
-        
-    mesh.tag("zone", value=zone_num, dtype=int)
-    #mesh.tag("mat_name", value=mat_names)
-    #mesh.tag("mat_volfrac", value=mat_volfrac, dtype=float)
-    
-    #print(mesh.mat_name)
-    #print(mesh.mat_volfrac)
-    
-    return zones_formatted, zones_novoid, mesh
-    
 
 def _check_fine_mesh_total(block01):
     """Check that the fine mesh total is greater than or equal to 7.
@@ -803,6 +769,49 @@ def _write_input(title, block01, block02, block03, block04, block05, name=None):
     f.write(partisn)
 
 
+def _tag_mesh(mesh, voxel_zone, zones_novoid):
+
+    # Find majorant material name in each zone
+    majorant_mat_name = {}  # keys = zone numbers, items = mat name
+    for i, z in enumerate(zones_novoid):
+        ff = 0
+        jj = -1
+        # find majorant volume fraction
+        for j, f in enumerate(zones_novoid[z]['vol_frac']):
+            if f > 0.5:
+                ff = f
+                jj = j
+                break
+            elif f > ff:
+                ff = f
+                jj = j
+                
+        # find corresponding material number and put in array
+        majorant_mat_name[z] = zones_novoid[z]['mat'][jj]
+                
+        # check if majorant material is actually void by summing all present 
+        # materials
+        total = sum(zones_novoid[z]['vol_frac'])
+        if total < 1.0:   # added tolerance
+            void = 1.0 - total
+            if void > ff:
+                majorant_mat_name[i] = 'void'    # rename as void
+    
+    print(majorant_mat_name)
+    
+    # Assign material name an integer, in the order that they appear in the 
+    # partisn input
+    
+
+    # Tag mesh with zone number
+    zone_num = np.empty(len(voxel_zone), dtype=int)  
+
+    for i, v in enumerate(voxel_zone):
+        zone_num[i] = voxel_zone[v]
+        
+    mesh.tag("partisn_zone", value=zone_num, dtype=int)
+    
+    
 def format_repeated_vector(vector):
     """Creates string out of a vector with the PARTISN format for repeated
     numbers.
