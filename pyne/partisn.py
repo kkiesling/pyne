@@ -835,6 +835,13 @@ def _tag_mesh(mesh, voxel_zone, zones_novoid, mat_xs_names):
     # Tag mesh with zone number and majority material number
     zone_num = np.empty(len(voxel_zone), dtype=int)
     maj_mat = np.empty(len(voxel_zone), dtype=int)
+    
+    print("******")
+    print(majorant_mat_num)
+    print("######")
+    print(majorant_mat_name)
+    print("%%%%%")
+    print(mat_xs_names)
 
     for i, v in enumerate(voxel_zone):
         zone_num[i] = voxel_zone[v]
