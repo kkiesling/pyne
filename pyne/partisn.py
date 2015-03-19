@@ -836,20 +836,23 @@ def _tag_mesh(mesh, voxel_zone, zones_novoid, mat_xs_names):
     zone_num = np.empty(len(voxel_zone), dtype=int)
     maj_mat = np.empty(len(voxel_zone), dtype=int)
     
-    print("******")
-    print(majorant_mat_num)
-    print("######")
-    print(majorant_mat_name)
-    print("%%%%%")
-    print(mat_xs_names)
+    #print("******")
+    #print(majorant_mat_num)
+    #print("######")
+    #print(majorant_mat_name)
+    #print("%%%%%")
+    #print(mat_xs_names)
 
     for i, v in enumerate(voxel_zone):
         zone_num[i] = voxel_zone[v]
-        mat = majorant_mat_name[voxel_zone[v]]
-        if mat == "void":
-            maj_mat[i] = 0
+        if voxel_zone[v] == 0:  # if entire zone is void
+            maj_mat[i] = 0;
         else:
-            maj_mat[i] = majorant_mat_num[mat]
+            mat = majorant_mat_name[voxel_zone[v]]
+            if mat == "void":   # if majorant is void
+                maj_mat[i] = 0
+            else:
+                maj_mat[i] = majorant_mat_num[mat]
  
     mesh.tag("partisn_zone", value=zone_num, dtype=int)
     mesh.tag("partisn_majority_matl", value=maj_mat, dtype=int)
