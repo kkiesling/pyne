@@ -73,7 +73,7 @@ def write_partisn_input(mesh, hdf5, ngroup, pn, **kwargs):
         Mesh can be 1-D (Nx1x1 mesh), 2-D (NxMx1 mesh), or 3-D (NxMxP mesh).
         Note: Only Cartesian meshes are currently supported. 
         This mesh will be updated with tags for zone number ("partisn_zone") 
-        and majority material number ("partisn_majority_matl").
+        and majority material number ("partisn_maj_matl").
     hdf5 : string
         File path to a material-laden dagmc geometry file.
     ngroup : int
@@ -152,7 +152,7 @@ def write_partisn_input(mesh, hdf5, ngroup, pn, **kwargs):
     else:
         input_file_tf = False
         
-    # skip
+    # skip volumes with no materials
     if 'skip_empty' in kwargs:
         skip_empty = kwargs['skip_empty']
     else:
@@ -397,9 +397,9 @@ def _get_zones(mesh, hdf5, bounds, num_rays, grid, skip_empty):
                 warn("Cell {0} does not have a material".format(cell))
                 cell_empty = True
 
-    # if cells were empty and skip_empty is false, issue error and end program
+    # if cells were empty and skip_empty is false, issue error
     if not skip_empty and cell_empty:
-        sys.exit("ERROR: There are cell(s) without materials in this geometry. Program ended.")
+        raise NameError("There are cell(s) without materials in this geometry.")
     
     # Remove vacuum or graveyard from material definition if not vol_frac of 1.0
     skip_array = [['mat:Vacuum'], ['mat:vacuum'], ['mat:Graveyard'], ['mat:graveyard']]
@@ -836,13 +836,7 @@ def _tag_mesh(mesh, voxel_zone, zones_novoid, mat_xs_names):
     zone_num = np.empty(len(voxel_zone), dtype=int)
     maj_mat = np.empty(len(voxel_zone), dtype=int)
     
-    #print("******")
-    #print(majorant_mat_num)
-    #print("######")
-    #print(majorant_mat_name)
-    #print("%%%%%")
-    #print(mat_xs_names)
-
+    
     for i, v in enumerate(voxel_zone):
         zone_num[i] = voxel_zone[v]
         if voxel_zone[v] == 0:  # if entire zone is void
@@ -855,20 +849,20 @@ def _tag_mesh(mesh, voxel_zone, zones_novoid, mat_xs_names):
                 maj_mat[i] = majorant_mat_num[mat]
  
     mesh.tag("partisn_zone", value=zone_num, dtype=int)
-    mesh.tag("partisn_majority_matl", value=maj_mat, dtype=int)
+    mesh.tag("partisn_maj_matl", value=maj_mat, dtype=int)
     
     
 def format_repeated_vector(vector):
     """Creates string out of a vector with the PARTISN format for repeated
     numbers.
     
-    Parameters:
-    -----------
+    Parameters
+    ----------
     vector: list
         Desired list to be formatted
     
-    Returns:
-    --------
+    Returns
+    -------
     string: string
         Formatted string representation of the vector
     
