@@ -77,7 +77,7 @@ def write_partisn_input(mesh, hdf5, ngroup, pn, **kwargs):
     ngroup : int
         The number of energy groups in the cross section library.
     pn : int
-        The number of moments in a P_n expansion of the source.
+        The number N in a P_N expansion of the source.
     data_hdf5path : string, optional, default = material_library/materials
         the path in the heirarchy to the data table in an HDF5 file.
     nuc_hdf5path : string, optional, default = material_library/nucid
@@ -243,6 +243,8 @@ def _get_material_lib(hdf5, data_hdf5path, nuc_hdf5path, **kwargs):
             # convert from [at/cc] to [at/b-cm]
             comp_list[nucid] = dens*10.**-24
         mat_lib[mat_name] = comp_list
+    
+    print(mat_lib)
 
     return mat_lib
 
