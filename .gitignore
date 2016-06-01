@@ -50,3 +50,7 @@ tests/fort.8
 tests/endftape.100
 tests/test_fluka_data.h5m
 tests/epdl97_eedl_Pb
+src/atomic_data.cpp
+src/atomic_data.h
+tests/98AK04.in
+tests/ELE.in
