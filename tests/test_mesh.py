@@ -17,6 +17,7 @@ except:
 from itertools import zip_longest
 
 from operator import itemgetter
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_raises, with_setup, \
     assert_is, assert_is_instance, assert_in, assert_not_in, assert_almost_equal, \
     assert_is_none, assert_is_not_none, assert_false
