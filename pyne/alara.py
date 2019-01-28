@@ -484,16 +484,25 @@ def num_density_to_mesh(lines, time, m):
     elif not isinstance(lines, collections.Sequence):
         raise TypeError("Lines argument not a file or sequence.")
     # Advance file to number density portion.
-    header = b'Number Density [atoms/cm3]'
+    header = [b'Number Density [atoms/cm3]', 'Number Density [atoms/cm3]']
     line = ""
-    while line.rstrip() != header:
+    while line.rstrip() not in header:
         line = lines.pop(0)
 
 
     # Get decay time index from next line (the column the decay time answers
     # appear in.
-    line_strs = lines.pop(0).replace(b'\t', b'  ')
-    time_index = [s.strip() for s in line_strs.split(b'  ')
+    try:
+        line_strs = lines[0].replace(b'\t', b'  ')
+    except:
+        line_strs = lines[0].replace('\t', '  ')
+    lines.pop(0)
+
+    try:
+        time_index = [s.strip() for s in line_strs.split(b'  ')
+                  if s.strip()].index(time)
+    except:
+        time_index = [s.strip() for s in line_strs.split('  ')
                   if s.strip()].index(time)
 
     # Create a dict of mats for the mesh.
@@ -502,22 +511,38 @@ def num_density_to_mesh(lines, time, m):
     # Read through file until enough material objects are create to fill mesh.
     while count != len(m):
         # Pop lines to the start of the next material.
-        while (lines.pop(0).decode('utf-8') + " " )[0] != '=':
-            pass
+        tmp_line = ""
+        while (tmp_line + " " )[0] != '=':
+            try:
+                tmp_line = lines[0].decode('utf-8')
+            except:
+                tmp_line = lines[0]
+            lines.pop(0)
 
         # Create a new material object and add to mats dict.
-        line = lines.pop(0)
+        try:
+            line = lines.pop(0).decode('utf-8')
+        except:
+            line = lines.pop(0)
+
         nucvec = {}
         density = 0.0
         # Read lines until '=' delimiter at the end of a material.
-        while line.decode('utf-8')[0] != '=':
-            nuc = line.split()[0].decode('utf-8')
+        while line[0] != '=':
+            try:
+                nuc = line.split()[0].decode('utf-8')
+            except:
+                nuc = line.split()[0]
+
             n = float(line.split()[time_index])
             if n != 0.0:
                 nucvec[nuc] = n
                 density += n * anum(nuc)/N_A
 
-            line = lines.pop(0)
+            try:
+                line = lines.pop(0).decode('utf-8')
+            except:
+                line = lines.pop(0)
         mat = from_atom_frac(nucvec, density=density, mass=0)
         mats[count] = mat
         count += 1
