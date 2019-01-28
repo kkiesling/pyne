@@ -73,31 +73,10 @@ def irradiation_setup_structured(flux_tag = "n_flux", meshtal_file = "meshtal_2x
 
     m = Mesh(structured=True, mesh=output_mesh, mats=output_mesh)
 
-    m_out = [m.n_flux[:].tolist(), m.n_flux_err[:].tolist(),
+    out = [m.n_flux[:].tolist(), m.n_flux_err[:].tolist(),
         m.n_flux_total[:].tolist(), m.n_flux_err_total[:].tolist(),
         [x.comp.items() for y, x, z in m], [x.density for y, x, z in m]]
 
-    os.remove(alara_inp)
-    os.remove(alara_matlib)
-    os.remove(fluxin)
-    os.remove(output_mesh)
-
-    return [m_out, f1, f2, f3]
-
-
-def test_irradiation_setup_structured():
-    p = multiprocessing.Pool()
-    r = p.apply_async(irradiation_setup_structured)
-    p.close()
-    p.join()
-    results = r.get()
-
-    # unpack return values
-    f1 = results[1]
-    f2 = results[2]
-    f3 = results[3]
-
-    out = results[0]
     n_flux = out[0]
     n_flux_err = out[1]
     n_flux_total = out[2]
@@ -132,6 +111,28 @@ def test_irradiation_setup_structured():
         assert_almost_equal(nft, tot_fluxes[i])
         assert_almost_equal(nfte, tot_errs[i])
         i+=1
+
+    os.remove(alara_inp)
+    os.remove(alara_matlib)
+    os.remove(fluxin)
+    os.remove(output_mesh)
+
+    return [f1, f2, f3]
+
+
+def test_irradiation_setup_structured():
+    p = multiprocessing.Pool()
+    r = p.apply_async(irradiation_setup_structured)
+    p.close()
+    p.join()
+    results = r.get()
+
+    # unpack return values
+    f1 = results[0]
+    f2 = results[1]
+    f3 = results[2]
+
+
 
     # test that files match
     assert(f1 == True)
@@ -207,7 +208,7 @@ def irradiation_setup_unstructured(flux_tag = "n_flux"):
                                 ('rel_error', np.float64)])
     cell_fracs[:] = [(0, 3, 1.0, 1.0), (1, 3, 1.0, 1.0), (2, 3, 1.0, 1.0), (3, 3, 1.0, 1.0)]
     irradiation_setup(flux_mesh=meshtal_mesh_file, cell_mats=cell_mats, cell_fracs=cell_fracs,
-                      alara_params=alara_params, flux_tag=flux_tag, 
+                      alara_params=alara_params, flux_tag=flux_tag,
                       fluxin=fluxin, reverse=reverse, alara_inp=alara_inp,
                       alara_matlib=alara_matlib, output_mesh=output_mesh,
                       output_material=output_material)
