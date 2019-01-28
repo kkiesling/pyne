@@ -40,6 +40,7 @@ from pyne.material import Material
 from pymoab import core, hcoord, scd, types
 from pymoab.types import _eh_py_type
 
+
 def try_rm_file(filename):
     return lambda: os.remove(filename) if os.path.exists(filename) else None
 
@@ -540,7 +541,7 @@ def test_matlib():
     m2 = Mesh(mesh='test_matlib2.h5m')  # MOAB fails to flush
     for i, mat, ve in m2:
         assert_equal(len(mat.comp), len(mats[i].comp))
-        for key in mats[i].iterkeys():
+        for key in iter(mats[i].keys()):
             assert_equal(mat.comp[key], mats[i].comp[key])
         assert_equal(mat.density, mats[i].density)
         assert_equal(m2.idx[i], i)
