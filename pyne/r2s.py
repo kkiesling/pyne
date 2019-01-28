@@ -12,7 +12,7 @@ warn(__name__ + " is not yet QA compliant.", QAWarning)
 
 
 def irradiation_setup(flux_mesh, cell_mats, cell_fracs, alara_params, tally_num=4,
-                      num_rays=10, grid=False, flux_tag="n_flux", 
+                      num_rays=10, grid=False, flux_tag="n_flux",
                       fluxin="alara_fluxin", reverse=False,
                       alara_inp="alara_inp", alara_matlib="alara_matlib",
                       output_mesh="r2s_step1.h5m", output_material=False,
@@ -161,7 +161,7 @@ def total_photon_source_intensity(m, tag_name, sub_voxel=False):
        The name of the tag on the mesh with the photon emission density information.
     sub_voxel: bool, optional
         If true, sub-voxel r2s work flow will be used.
-                         
+
     Returns
     -------
     intensity : float
@@ -178,7 +178,7 @@ def total_photon_source_intensity(m, tag_name, sub_voxel=False):
             ve_data = sd_tag[ve]
             for svid in range(max_num_cells):
                 vol = m.elem_volume(ve) * cell_fracs[idx][svid]
-                sv_data = ve_data[num_e_groups*svid:num_e_groups*(svid+1)]
+                sv_data = ve_data[int(num_e_groups*svid):int(num_e_groups*(svid+1))]
                 intensity += vol * np.sum(sv_data)
     else:
         for idx, _, ve in m:
