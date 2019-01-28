@@ -2,7 +2,10 @@
 This module contains functions for mesh-based Monte Carlo variance reduction.
 """
 
-from itertools import izip
+try:
+    from itertools import izip as zip
+except:
+    pass
 from warnings import warn
 from pyne.utils import QAWarning
 
@@ -20,10 +23,10 @@ else:
          "Some aspects of the variance reduction module may be incomplete.",
          QAWarning)
 
-from mesh import Mesh
-from mesh import MeshError
-from mesh import NativeMeshTag
-from mcnp import Wwinp
+from pyne.mesh import Mesh
+from pyne.mesh import MeshError
+from pyne.mesh import NativeMeshTag
+from pyne.mcnp import Wwinp
 from pyne.particle import mcnp
 
 def cadis(adj_flux_mesh, adj_flux_tag, q_mesh, q_tag,
@@ -117,7 +120,7 @@ def cadis(adj_flux_mesh, adj_flux_tag, q_mesh, q_tag,
     q_ves.reset()
     adj_ves.reset()
 
-    for adj_ve, q_ve, ww_ve, q_bias_ve in izip(adj_ves, q_ves,
+    for adj_ve, q_ve, ww_ve, q_bias_ve in zip(adj_ves, q_ves,
                                                ww_ves, q_bias_ves):
         adj_flux = adj_flux_mesh.get_tag(adj_flux_tag)[adj_ve]
         adj_flux = np.atleast_1d(adj_flux)
