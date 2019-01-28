@@ -545,7 +545,11 @@ def write_partisn_input_with_names_dict():
     ngroup = 5
 
     # expected output file
-    file_expected = THIS_DIR + '/files_test_partisn/partisn_nucnames_expected.inp'
+    import platform
+    if platform.python_version().split('.')[0] == '2':
+        file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_nucnames_expected-2.inp')
+    elif platform.python_version().split('.')[0] == '3':
+        file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_nucnames_expected-3.inp')
 
     partisn.write_partisn_input(mesh, hdf5, ngroup,
         data_hdf5path=data_hdf5path, nuc_hdf5path=nuc_hdf5path,
@@ -573,7 +577,12 @@ def write_partisn_input_options():
     THIS_DIR = os.path.dirname(os.path.realpath(__file__))
     hdf5 = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_test_geom.h5m')
     input_file = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_options.inp')
-    file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_options_expected.inp')
+
+    import platform
+    if platform.python_version().split('.')[0] == '2':
+        file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_options_expected-2.inp')
+    elif platform.python_version().split('.')[0] == '3':
+        file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_options_expected-3.inp')
 
     sc = [-5., 0., 10., 15.], [-5., 5.], [-5., 5.]
     mesh=Mesh(structured_coords=sc, structured=True)

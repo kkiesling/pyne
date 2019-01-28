@@ -611,7 +611,7 @@ def _write_input(title, block01, block02, block03, block04, block05, cards, file
     partisn += "/ meshed area are listed.\n"
     partisn += "names= "
     count = 0
-    for i, name in enumerate(block03['names']):
+    for i, name in enumerate(sorted(block03['names'])):
         count += 1
         partisn += "{0} ".format(name)
         if count == 10:
@@ -643,11 +643,11 @@ def _write_input(title, block01, block02, block03, block04, block05, cards, file
     partisn += "\n/ \n"
 
     partisn += "matls= "
-    for i, mat in enumerate(block04['matls']):
+    for i, mat in sorted(enumerate(block04['matls'])):
         partisn += "{0} ".format(mat)
         count = 0
         j = 0
-        for iso, dens in block04['matls'][mat].items():
+        for iso, dens in sorted(block04['matls'][mat].items()):
             count += 1
             j += 1
             if j != len(block04['matls'][mat]):
