@@ -397,7 +397,11 @@ def write_partisn_input_1D():
     ngroup = 5
 
     # expected output file
-    file_expected = THIS_DIR + '/files_test_partisn/partisn_1D_expected.inp'
+    import platform
+    if platform.python_version().split('.')[0] == '2':
+        file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_1D_expected-2.inp')
+    elif platform.python_version().split('.')[0] == '3':
+        file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_1D_expected-3.inp')
 
     partisn.write_partisn_input(mesh, hdf5, ngroup,
         data_hdf5path=data_hdf5path, nuc_hdf5path=nuc_hdf5path,
@@ -440,7 +444,11 @@ def write_partisn_input_2D():
     ngroup = 5
 
     # expected output file
-    file_expected = THIS_DIR + '/files_test_partisn/partisn_2D_expected.inp'
+    import platform
+    if platform.python_version().split('.')[0] == '2':
+        file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_2D_expected-2.inp')
+    elif platform.python_version().split('.')[0] == '3':
+        file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_2D_expected-3.inp')
 
     partisn.write_partisn_input(mesh, hdf5, ngroup,
         data_hdf5path=data_hdf5path, nuc_hdf5path=nuc_hdf5path,
@@ -487,7 +495,11 @@ def write_partisn_input_3D():
     ngroup = 5
 
     # expected output file
-    file_expected = THIS_DIR + '/files_test_partisn/partisn_3D_expected.inp'
+    import platform
+    if platform.python_version().split('.')[0] == '2':
+        file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_3D_expected-2.inp')
+    elif platform.python_version().split('.')[0] == '3':
+        file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_3D_expected-3.inp')
 
     partisn.write_partisn_input(mesh, hdf5, ngroup,
         data_hdf5path=data_hdf5path, nuc_hdf5path=nuc_hdf5path,
