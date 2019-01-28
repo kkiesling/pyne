@@ -488,11 +488,11 @@ def test_num_den_to_mesh_shutdown():
     act_comp_1 = m.mats[1].to_atom_frac()
 
     assert_equal(len(exp_comp_0), len(act_comp_0))
-    for key, value in exp_comp_0.iteritems():
+    for key, value in exp_comp_0.items():
         assert_almost_equal(value/act_comp_0[key], 1.0, 15)
 
     assert_equal(len(exp_comp_1), len(act_comp_1))
-    for key, value in exp_comp_1.iteritems():
+    for key, value in exp_comp_1.items():
         assert_almost_equal(value/act_comp_1[key], 1.0, 15)
 
     # compare densities
@@ -514,7 +514,7 @@ def test_num_den_to_mesh_stdout():
     p = subprocess.Popen(["cat", filename], stdout=subprocess.PIPE)
     lines, err = p.communicate()
 
-    num_density_to_mesh(lines.split('\n'), 'shutdown', m)
+    num_density_to_mesh(lines.split(b'\n'), b'shutdown', m)
 
     # expected composition results:
     exp_comp_0 = {10010000:5.3390e+19,
@@ -533,11 +533,11 @@ def test_num_den_to_mesh_stdout():
     act_comp_1 = m.mats[1].to_atom_frac()
 
     assert_equal(len(exp_comp_0), len(act_comp_0))
-    for key, value in exp_comp_0.iteritems():
+    for key, value in exp_comp_0.items():
         assert_almost_equal(value/act_comp_0[key], 1.0, 15)
 
     assert_equal(len(exp_comp_1), len(act_comp_1))
-    for key, value in exp_comp_1.iteritems():
+    for key, value in exp_comp_1.items():
         assert_almost_equal(value/act_comp_1[key], 1.0, 15)
 
     # compare densities
@@ -574,11 +574,11 @@ def test_num_den_to_mesh_1_y():
     act_comp_1 = m.mats[1].to_atom_frac()
 
     assert_equal(len(exp_comp_0), len(act_comp_0))
-    for key, value in exp_comp_0.iteritems():
+    for key, value in exp_comp_0.items():
         assert_almost_equal(value/act_comp_0[key], 1.0, 15)
 
     assert_equal(len(exp_comp_1), len(act_comp_1))
-    for key, value in exp_comp_1.iteritems():
+    for key, value in exp_comp_1.items():
         assert_almost_equal(value/act_comp_1[key], 1.0, 15)
 
     # compare densities
