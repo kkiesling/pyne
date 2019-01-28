@@ -236,7 +236,7 @@ def photon_source_hdf5_to_mesh(mesh, filename, tags, sub_voxel=False,
     phtn_src_dc = []
     with tb.open_file(filename) as h5f:
         for row in h5f.root.data:
-            phtn_src_dc.append(row[2])
+            phtn_src_dc.append(row[2].decode('utf-8'))
     phtn_src_dc = list(set(phtn_src_dc))
 
     # iterate through each requested nuclide/dectay time
