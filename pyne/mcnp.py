@@ -2241,7 +2241,13 @@ def _mesh_to_cell_cards(mesh, divs):
         for j in range(1, len(divs[1])):
             for k in range(1, len(divs[2])):
                 # Cell number, mat number, density
-                cell_cards += "{0} {1} {2} ".format(count, count,
+                try:
+                    # python 2
+                    cell_cards += "{0} {1} {2} ".format(count, count,
+                                                    mesh.density[idx.next()])
+                except:
+                    # python 3
+                    cell_cards += "{0} {1} {2} ".format(count, count,
                                                     mesh.density[idx.__next__()])
                 # x, y, and z surfaces
                 cell_cards += "{0} -{1} {2} -{3} {4} -{5}\n".format(
