@@ -391,7 +391,7 @@ def record_to_geom(mesh, cell_fracs, cell_mats, geom_file, matlib_file,
             printed_mats.append(name)
             matlib += '{0}    {1: 1.6E}    {2}\n'.format(name, mat.density,
                                                          len(mat.comp))
-            for nuc, comp in mat.comp.iteritems():
+            for nuc, comp in mat.comp.items():
                 matlib += '{0}    {1: 1.6E}    {2}\n'.format(alara(nuc),
                                                       comp*100.0, znum(nuc))
             matlib += '\n'
@@ -444,7 +444,7 @@ def mesh_to_geom(mesh, geom_file, matlib_file):
         mixture += ("mixture mix_{0}\n"
                     "    material mat_{0} 1 1\nend\n\n".format(i))
 
-        for nuc, comp in mesh.comp[i].iteritems():
+        for nuc, comp in mesh.comp[i].items():
             matlib += "{0}    {1: 1.6E}    {2}\n".format(alara(nuc), comp*100.0,
                                                          znum(nuc))
         matlib += "\n"
@@ -484,15 +484,16 @@ def num_density_to_mesh(lines, time, m):
     elif not isinstance(lines, collections.Sequence):
         raise TypeError("Lines argument not a file or sequence.")
     # Advance file to number density portion.
-    header = 'Number Density [atoms/cm3]'
+    header = b'Number Density [atoms/cm3]'
     line = ""
     while line.rstrip() != header:
         line = lines.pop(0)
 
+
     # Get decay time index from next line (the column the decay time answers
     # appear in.
-    line_strs = lines.pop(0).replace('\t', '  ')
-    time_index = [s.strip() for s in line_strs.split('  ')
+    line_strs = lines.pop(0).replace(b'\t', b'  ')
+    time_index = [s.strip() for s in line_strs.split(b'  ')
                   if s.strip()].index(time)
 
     # Create a dict of mats for the mesh.
@@ -501,7 +502,7 @@ def num_density_to_mesh(lines, time, m):
     # Read through file until enough material objects are create to fill mesh.
     while count != len(m):
         # Pop lines to the start of the next material.
-        while (lines.pop(0) + " " )[0] != '=':
+        while (lines.pop(0).decode('utf-8') + " " )[0] != '=':
             pass
 
         # Create a new material object and add to mats dict.
@@ -509,8 +510,8 @@ def num_density_to_mesh(lines, time, m):
         nucvec = {}
         density = 0.0
         # Read lines until '=' delimiter at the end of a material.
-        while line[0] != '=':
-            nuc = line.split()[0]
+        while line.decode('utf-8')[0] != '=':
+            nuc = line.split()[0].decode('utf-8')
             n = float(line.split()[time_index])
             if n != 0.0:
                 nucvec[nuc] = n
