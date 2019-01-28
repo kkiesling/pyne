@@ -5,6 +5,7 @@ import subprocess
 
 from nose.tools import assert_almost_equal
 from nose.tools import assert_equal, assert_true, with_setup
+from nose.plugins.skip import SkipTest
 from numpy.testing import assert_array_equal
 import numpy as np
 import tables as tb
