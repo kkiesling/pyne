@@ -483,6 +483,7 @@ def num_density_to_mesh(lines, time, m):
             lines = f.readlines()
     elif not isinstance(lines, collections.Sequence):
         raise TypeError("Lines argument not a file or sequence.")
+
     # Advance file to number density portion.
     header = [b'Number Density [atoms/cm3]', 'Number Density [atoms/cm3]']
     line = ""
@@ -520,10 +521,11 @@ def num_density_to_mesh(lines, time, m):
             lines.pop(0)
 
         # Create a new material object and add to mats dict.
+        tmp_line = lines.pop(0)
         try:
-            line = lines.pop(0).decode('utf-8')
+            line = tmp_line.decode('utf-8')
         except:
-            line = lines.pop(0)
+            line = tmp_line
 
         nucvec = {}
         density = 0.0
@@ -539,10 +541,12 @@ def num_density_to_mesh(lines, time, m):
                 nucvec[nuc] = n
                 density += n * anum(nuc)/N_A
 
+            tmp_line = lines.pop(0)
             try:
-                line = lines.pop(0).decode('utf-8')
+                line = tmp_line.decode('utf-8')
             except:
-                line = lines.pop(0)
+                line = tmp_line
+
         mat = from_atom_frac(nucvec, density=density, mass=0)
         mats[count] = mat
         count += 1
