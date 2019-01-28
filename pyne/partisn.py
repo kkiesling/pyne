@@ -233,7 +233,7 @@ def _get_material_lib(hdf5, data_hdf5path, nuc_hdf5path, **kwargs):
         comp = mats_collapsed[mat_name]
         atom_dens_dict = comp.to_atom_dens()
         comp_list = {}
-        for nucid, dens in atom_dens_dict.iteritems():
+        for nucid, dens in atom_dens_dict.items():
             # convert from [at/cc] to [at/b-cm]
             comp_list[nucid] = dens*10.**-24
         mat_lib[mat_name] = comp_list
@@ -377,7 +377,7 @@ def _get_zones(mesh, hdf5, bounds, num_rays, grid, dg, mat_assigns, unique_names
     skip_array = [['mat:Vacuum'], ['mat:vacuum'], ['mat:Graveyard'], ['mat:graveyard']]
     skip_list = ['mat:Vacuum', 'mat:vacuum', 'mat:Graveyard', 'mat:graveyard']
     zones_compressed = {}
-    for z, info in zones.iteritems():
+    for z, info in zones.items():
         # check first if the definition is 100% void, keep same if is
         if zones[z]['mat'] in skip_array and zones[z]['vol_frac'] == [1.0]:
             zones_compressed[z] = info
@@ -396,9 +396,9 @@ def _get_zones(mesh, hdf5, bounds, num_rays, grid, dg, mat_assigns, unique_names
     z = 0
     match = False
     first = True
-    for i, vals in zones_compressed.iteritems():
+    for i, vals in zones_compressed.items():
         # Find if the zone already exists
-        for zone, info in zones_mats.iteritems():
+        for zone, info in zones_mats.items():
             # Iterate through both sets to disregard order
             match_all = np.empty(len(vals['mat']), dtype=bool)
             match_all.fill(False)
@@ -519,7 +519,7 @@ def _write_input(title, block01, block02, block03, block04, block05, cards, file
 
     block1_cards = []
     if 'block1' in cards:
-      for card, value in cards['block1'].iteritems():
+      for card, value in cards['block1'].items():
           partisn += "{}={}\n".format(card, value)
           block1_cards.append(card)
 
@@ -595,7 +595,7 @@ def _write_input(title, block01, block02, block03, block04, block05, cards, file
             partisn += "\n"
 
     if 'block2' in cards:
-      for card, value in cards['block2'].iteritems():
+      for card, value in cards['block2'].items():
           partisn += "{}={}\n".format(card, value)
 
     partisn += "t"
@@ -623,7 +623,7 @@ def _write_input(title, block01, block02, block03, block04, block05, cards, file
 
     block3_cards = []
     if 'block3' in cards:
-      for card, value in cards['block3'].iteritems():
+      for card, value in cards['block3'].items():
           partisn += "{}={}\n".format(card, value)
           block3_cards.append(card)
 
@@ -647,7 +647,7 @@ def _write_input(title, block01, block02, block03, block04, block05, cards, file
         partisn += "{0} ".format(mat)
         count = 0
         j = 0
-        for iso, dens in block04['matls'][mat].iteritems():
+        for iso, dens in block04['matls'][mat].items():
             count += 1
             j += 1
             if j != len(block04['matls'][mat]):
@@ -681,7 +681,7 @@ def _write_input(title, block01, block02, block03, block04, block05, cards, file
                     partisn += "{} {:.4e};\n        ".format(mat, block04['assign'][z]['vol_frac'][j])
 
     if 'block4' in cards:
-      for card, value in cards['block4'].iteritems():
+      for card, value in cards['block4'].items():
           partisn += "{}={}\n".format(card, value)
 
     partisn += "t"
@@ -703,7 +703,7 @@ def _write_input(title, block01, block02, block03, block04, block05, cards, file
         default_source = True
 
     if 'block5' in cards:
-      for card, value in cards['block5'].iteritems():
+      for card, value in cards['block5'].items():
           if card != 'source':
               partisn += "{}={}\n".format(card, value)
     partisn += "t\n"
