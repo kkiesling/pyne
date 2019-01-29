@@ -14,8 +14,6 @@ try:
 except:
     from itertools import zip_longest
 
-from itertools import zip_longest
-
 from operator import itemgetter
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_raises, with_setup, \
