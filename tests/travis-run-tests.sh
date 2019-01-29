@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ ! $# -eq 2 ]
+if [ ! $# -eq 1 ]
 then
     echo "Python version not specified!"
     echo "Usage: \"./travis-run-tests.sh pythonX\" with X=2/3 "
@@ -8,6 +8,7 @@ then
 fi
 
 
+test_command="no_test_command"
 if [ $1 == "python2" ] ; then
     test_command="nosetests"
 elif [ $1 == "python3" ] ; then
