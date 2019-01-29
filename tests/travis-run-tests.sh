@@ -1,11 +1,17 @@
 #!/bin/bash
 
+if [ ! $# -eq 2 ]
+then
+    echo "Python version not specified!"
+    echo "Usage: \"./travis-run-tests.sh pythonX\" with X=2/3 "
+    exit 1
+fi
+
+
 if [ $1 == "python2" ] ; then
     test_command="nosetests"
 elif [ $1 == "python3" ] ; then
     test_command="nosetests3"
-else 
-    test_command="no_test_command"
 fi
      
 for x in $(ls test*.py */test*.py); do 
