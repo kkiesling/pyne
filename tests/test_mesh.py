@@ -8,7 +8,7 @@ import itertools
 try:
     from itertools import izip as zip # python2
 except:
-    from itertools import izip_longest as zip # python3
+    from itertools import zip_longest as zip # python3
 try:
     from itertools import izip_longest as zip_longest # python2
 except:
