@@ -711,7 +711,9 @@ def test_isotropic_vol_source():
     spectra = [[0.1, 0.1, 0.1, 0.7], [0.3, 0.3, 0.3, 0.1]]
     intensities = [1, 2]
 
-    dg, s = partisn.isotropic_vol_source("files_test_partisn/source_boxes.h5m",
+    THIS_DIR = os.path.dirname(os.path.realpath(__file__))
+    hdf5 = os.path.join(THIS_DIR, 'files_test_partisn', 'source_boxes.h5m')
+    dg, s = partisn.isotropic_vol_source(hdf5,
                                           m, cells, spectra, intensities,
                                           num_rays=4, tag_name="src", grid=True)
     m.src = NativeMeshTag(4, float)
