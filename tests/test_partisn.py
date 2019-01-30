@@ -398,9 +398,9 @@ def write_partisn_input_1D():
 
     # expected output file
     import sys
-    if sys.version_info[0] <3 :
+    if sys.version_info[0] == 2 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_1D_expected-2.inp')
-    else :
+    elif sys.version_info[0] == 3 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_1D_expected-3.inp')
 
     partisn.write_partisn_input(mesh, hdf5, ngroup,
@@ -445,9 +445,9 @@ def write_partisn_input_2D():
 
     # expected output file
     import sys
-    if sys.version_info[0] <3 :
+    if sys.version_info[0] == 2 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_2D_expected-2.inp')
-    else :
+    elif sys.version_info[0] == 3 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_2D_expected-3.inp')
 
     partisn.write_partisn_input(mesh, hdf5, ngroup,
@@ -496,9 +496,9 @@ def write_partisn_input_3D():
 
     # expected output file
     import sys
-    if sys.version_info[0] <3 :
+    if sys.version_info[0] == 2 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_3D_expected-2.inp')
-    else :
+    elif sys.version_info[0] == 3 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_3D_expected-3.inp')
 
     partisn.write_partisn_input(mesh, hdf5, ngroup,
@@ -558,9 +558,9 @@ def write_partisn_input_with_names_dict():
 
     # expected output file
     import sys
-    if sys.version_info[0] <3 :
+    if sys.version_info[0] == 2 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_nucnames_expected-2.inp')
-    else :
+    elif sys.version_info[0] == 3 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_nucnames_expected-3.inp')
 
     partisn.write_partisn_input(mesh, hdf5, ngroup,
@@ -591,9 +591,9 @@ def write_partisn_input_options():
     input_file = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_options.inp')
 
     import sys
-    if sys.version_info[0] <3 :
+    if sys.version_info[0] == 2 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_options_expected-2.inp')
-    else :
+    elif sys.version_info[0] == 3 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_options_expected-3.inp')
 
     sc = [-5., 0., 10., 15.], [-5., 5.], [-5., 5.]
