@@ -472,11 +472,12 @@ def test_discretize_geom_rand():
     r = p.apply_async(discretize_geom_rand)
     p.close()
     p.join()
+    print("R ", r.get())
     rr = r.get()
 
     results = rr[0]
     coords = rr[1]
-
+    print("results ", results)
     assert_equal(len(results), (len(coords) - 1)**3)
 
     for res in results:
