@@ -6,15 +6,13 @@ import shutil
 import warnings
 import itertools
 try:
-    from itertools import izip as zip
+    from itertools import izip as zip # python2
 except:
-    pass
+    from itertools import zip_longest as zip # python3
 try:
-    from itertools import izip_longest as zip_longest
+    from itertools import izip_longest as zip_longest # python2
 except:
-    from itertools import zip_longest
-
-from itertools import zip_longest
+    from itertools import zip_longest # python3
 
 from operator import itemgetter
 from nose.plugins.skip import SkipTest
@@ -426,7 +424,7 @@ def test_iterate_3d():
 
     def test_order(order, *args,  **kw):
         all_indices = itertools.product(*args)
-        for ijk_index, sm_x in zip_longest(_tuple_sort(all_indices, order),
+        for ijk_index, sm_x in zip(_tuple_sort(all_indices, order),
                                      sm.structured_iterate_hex(order,**kw)):
             assert_equal(sm.structured_get_hex(*ijk_index), sm_x)
 
@@ -500,12 +498,12 @@ def test_vtx_iterator():
         assert_equal(it_x,sm_x)
 
     it.reset()
-    for (it_x, sm_x) in zip_longest(it,
+    for (it_x, sm_x) in zip(it,
                                sm.structured_iterate_vertex("yx",z=sm.dims[2])):
         assert_equal(it_x,sm_x)
 
     it.reset()
-    for (it_x, sm_x) in zip_longest(it, sm.structured_iterate_vertex("x")):
+    for (it_x, sm_x) in zip(it, sm.structured_iterate_vertex("x")):
         assert_equal(it_x,sm_x)
 
 """\

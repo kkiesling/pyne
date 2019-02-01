@@ -397,10 +397,10 @@ def write_partisn_input_1D():
     ngroup = 5
 
     # expected output file
-    import platform
-    if platform.python_version().split('.')[0] == '2':
+    import sys
+    if sys.version_info[0] == 2 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_1D_expected-2.inp')
-    elif platform.python_version().split('.')[0] == '3':
+    elif sys.version_info[0] == 3 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_1D_expected-3.inp')
 
     partisn.write_partisn_input(mesh, hdf5, ngroup,
@@ -444,10 +444,10 @@ def write_partisn_input_2D():
     ngroup = 5
 
     # expected output file
-    import platform
-    if platform.python_version().split('.')[0] == '2':
+    import sys
+    if sys.version_info[0] == 2 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_2D_expected-2.inp')
-    elif platform.python_version().split('.')[0] == '3':
+    elif sys.version_info[0] == 3 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_2D_expected-3.inp')
 
     partisn.write_partisn_input(mesh, hdf5, ngroup,
@@ -495,10 +495,10 @@ def write_partisn_input_3D():
     ngroup = 5
 
     # expected output file
-    import platform
-    if platform.python_version().split('.')[0] == '2':
+    import sys
+    if sys.version_info[0] == 2 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_3D_expected-2.inp')
-    elif platform.python_version().split('.')[0] == '3':
+    elif sys.version_info[0] == 3 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_3D_expected-3.inp')
 
     partisn.write_partisn_input(mesh, hdf5, ngroup,
@@ -557,10 +557,10 @@ def write_partisn_input_with_names_dict():
     ngroup = 5
 
     # expected output file
-    import platform
-    if platform.python_version().split('.')[0] == '2':
+    import sys
+    if sys.version_info[0] == 2 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_nucnames_expected-2.inp')
-    elif platform.python_version().split('.')[0] == '3':
+    elif sys.version_info[0] == 3 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_nucnames_expected-3.inp')
 
     partisn.write_partisn_input(mesh, hdf5, ngroup,
@@ -590,10 +590,10 @@ def write_partisn_input_options():
     hdf5 = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_test_geom.h5m')
     input_file = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_options.inp')
 
-    import platform
-    if platform.python_version().split('.')[0] == '2':
+    import sys
+    if sys.version_info[0] == 2 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_options_expected-2.inp')
-    elif platform.python_version().split('.')[0] == '3':
+    elif sys.version_info[0] == 3 :
         file_expected = os.path.join(THIS_DIR, 'files_test_partisn', 'partisn_options_expected-3.inp')
 
     sc = [-5., 0., 10., 15.], [-5., 5.], [-5., 5.]
@@ -711,7 +711,9 @@ def test_isotropic_vol_source():
     spectra = [[0.1, 0.1, 0.1, 0.7], [0.3, 0.3, 0.3, 0.1]]
     intensities = [1, 2]
 
-    dg, s = partisn.isotropic_vol_source("files_test_partisn/source_boxes.h5m",
+    THIS_DIR = os.path.dirname(os.path.realpath(__file__))
+    hdf5 = os.path.join(THIS_DIR, 'files_test_partisn', 'source_boxes.h5m')
+    dg, s = partisn.isotropic_vol_source(hdf5,
                                           m, cells, spectra, intensities,
                                           num_rays=4, tag_name="src", grid=True)
     m.src = NativeMeshTag(4, float)
