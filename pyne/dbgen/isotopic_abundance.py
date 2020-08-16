@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from __future__ import print_function
 import pkgutil
 from pyne.utils import QA_warn
